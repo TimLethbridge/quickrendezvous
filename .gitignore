@@ -1,0 +1,7 @@
+html/queues/*/secretcode
+html/queues/*/apptavail/appt*
+html/queues/*/apptbooked/appt*
+
+
+# os specific:
+.DS_Store

@@ -15,6 +15,14 @@ if ($_SERVER['argc'] > 1) {
   }
 }
 
+// Default timezone. Can be overridden by arguments
+date_default_timezone_set("America/Toronto");
+
+if (isset($_REQUEST["tz"])) {
+  @date_default_timezone_set($_REQUEST["tz"]);
+}
+
+
 // TODO load special text for each queue
 if (!isset($_REQUEST["queuename"])) {
   $queuename="default";
@@ -26,6 +34,13 @@ else
     echo($queuename." is not a valid queue.\n");
     exit(-1);
   }
+}
+
+function randbase36($length) {
+  return(substr(
+    base_convert(rand(0,999999999).rand(0,9999999999),10,36),
+    1,
+    $length));
 }
 
 ?>

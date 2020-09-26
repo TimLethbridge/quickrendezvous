@@ -49,7 +49,14 @@ require_once ("scripts/config.php");
 </head>
 <body>
 
-<h1>Tool to quickly generate appointments first-come-first served fairly: Under development</h1>
+<h1>Book an appointment in queue: <?php echo $queuename ?></h1>
+
+<?php
+  if (isset($_REQUEST["errorToDisplay"])) {
+    echo("<b><p style=\"color:red\">".$_REQUEST["errorToDisplay"]."</p></b>");
+  }
+?>
+
 
 <p>This tool is under development, but functional. Currently this is a proof-of-concept to demonstrate a better way to book testing appointments for Covid-19. If all goes well we should be able turn this, or a similar system, live shortly. </p>
 
@@ -77,5 +84,9 @@ Register to get a booking code
 
 </input>
 </form>
+
+<?php
+require_once ("scripts/queuestats.php");
+?>
 
 </body>

@@ -11,6 +11,10 @@ It is intended to help during the Covid-19 pandemic, to handle such use cases as
 
 It is currently under development so should not be used with live data until this line is removed.
 
-It is fully open source, so can be installed on a private server. However there is a canonical implementation on the web at https://quickrendezvous.org Please view the 
+It is fully open source, so can be installed on a private server. However there is a canonical implementation on the web at https://quickrendezvous.org Additional details can be found by visiting that site. 
 
 For private installations, the only dependency is PhP. 
+
+This site is part of a research project at the University of Ottawa, and is intended for study by students.
+
+Contributions are welcome.

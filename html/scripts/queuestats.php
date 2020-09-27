@@ -12,10 +12,13 @@ $next3hourscount=0;
 $next8hourscount=0;
 $next24hourscount=0;
 $next48hourscount=0;
-$earliesttime="No appointments available";
+$earliesttime=trans("noneavail");
 $earlieststamp=999999999999999;
 $latesttime="";
 $lateststamp=0;
+
+$lttrans= trans("latest");
+$ettrans= trans("earliest");
 
 foreach($availlist as $listitem) {
   $apptdetail=explode("-",$listitem);
@@ -36,18 +39,18 @@ foreach($availlist as $listitem) {
     if($appttime < ($thecurrent+48*60*60)) $next48hourscount++;
     if($appttime > $lateststamp) {
       $lateststamp = $appttime;
-      $latesttime = "Latest appointment currently available to book: ".
-        date("l",$appttime)." ".
+      $latesttime = $lttrans.": <b>".
+        transday(date("l",$appttime))." ".
         $apptdetail[1]."-".$apptdetail[2]."-".$apptdetail[3]." ".
-        $apptdetail[4].":".$apptdetail[5].":".$apptdetail[6];
+        $apptdetail[4].":".$apptdetail[5].":".$apptdetail[6]."</b>";
     }
     if($appttime < $earlieststamp) {
       $earlieststamp = $appttime;
       // TODO date function below outputs in English only; must manually translate
-      $earliesttime = "Earliest appointment currently available: ".
-        date("l",$appttime)." ".
+      $earliesttime = $ettrans.": <b>".
+        transday(date("l",$appttime))." ".
         $apptdetail[1]."-".$apptdetail[2]."-".$apptdetail[3]." ".
-        $apptdetail[4].":".$apptdetail[5].":".$apptdetail[6];
+        $apptdetail[4].":".$apptdetail[5].":".$apptdetail[6]."</b>";
     }
   }
 }
@@ -57,21 +60,17 @@ ob_start();
 ?>
 
 <br/>
-<h2>Current information about queue <?php echo $queuename; ?></h2>
+<h2><?php echo trans("currentinfo");?></h2>
 
 <p><?php echo $earliesttime ?>
 
-<p><?php echo $next3hourscount ?>
- appointments available in the next 3 hours.</p>
+<p><?php echo $next3hourscount." ".trans1("avinnext",3); ?>.</p>
 
-<p><?php echo $next8hourscount-$next3hourscount ?>
- appointments available between 3 and 8 hours from now.</p>
+<p><?php echo $next8hourscount-$next3hourscount." ".trans2("avrange",3,8); ?>.</p>
 
-<p><?php echo $next24hourscount-$next8hourscount ?>
- appointments available between 8 and 24 hours from now.</p>
+<p><?php echo $next24hourscount-$next8hourscount." ".trans2("avrange",8,24); ?>.</p>
 
-<p><?php echo $next48hourscount-$next24hourscount ?>
- appointments available between 24 and 48 hours from now.</p>
+<p><?php echo $next48hourscount-$next24hourscount." ".trans2("avrange",24,48); ?>.</p>
 
 <p><?php echo $allapptcount-$next48hourscount ?>
  appointments currently accepting bookings after 48 hours from now.</p>

@@ -33,6 +33,36 @@ if (isset($_REQUEST["tz"])) {
   @date_default_timezone_set($_REQUEST["tz"]);
 }
 
+// Default language is English. But we set the lang variable to allow other language
+
+global $lang;
+if (isset($_REQUEST["lang"])) {
+  $lang=$_REQUEST["lang"];
+}
+else {
+  $lang="en";
+}
+if($lang!="en") {
+  $altlang="en";
+  $altlangword="English";
+}
+else { // if English the alternative is French
+  $altlang="fr";
+  $altlangword="Français";
+}
+
+// If the incoming query had a language argument, we get rid of it
+$otherargs=str_replace("&lang=".$lang,"",$_SERVER["QUERY_STRING"]);
+$otherargs=str_replace("lang=".$lang."&","",$otherargs);
+$otherargs=str_replace("lang=".$lang,"",$otherargs);
+
+$floatlangblock = "\n
+  <span style=\"float: right\">\n
+    <a href=\"?lang=".$altlang."&".$otherargs."\">".$altlangword."</a>\n
+    <span   id=\"qrcode\"> </span>\n
+  </span>\n";
+
+
 // Decide what to do if there is an error in a parameter or in the data
 //  Arguments: 
 //    errnum: 100-999 are problems with user arguments. 1000+ are system faults
@@ -105,5 +135,106 @@ function randbase36($length) {
     1,
     $length));
 }
+
+function trans($transkey) {
+  global $lang;
+  $transtab = array (
+    "bookin" => array (
+      "en" => "Book an appointment in queue",
+      "fr" => "Obtenir un rendez-vous dans la file d'attente"
+    ),
+    "startby" => array (
+      "en" => "Start by clicking the following button to obtain a booking code. This code will be valid for making one appointment for an individual or family",
+      "fr" => "Commencez par cliquer sur le bouton suivant pour obtenir un code de réservation. Ce code sera valable pour faire un rendez-vous pour une personne ou une famille"
+    ),
+    "register" => array (
+      "en" => "Register to get a booking code",
+      "fr" => "Inscrivez pour obtenir un code de réservation"
+    ),
+    "registerhelp" => array (
+      "en" => "This will ask you for basic information such as your name, and the number of people to attand the appointment. It will then give you a code that you can later use to request an appointment. When you are given the code, make sure you write it down. We will soon enhance this tool so it will also email and text the code to you.",
+      "fr" => "Cela vous demandera des informations de base telles que votre nom et le nombre de personnes qui assisteront au rendez-vous. Il vous donnera alors un code que vous devrez utiliser ultérieurement pour demander un rendez-vous. Lorsque vous recevez le code, assurez-vous de le noter. Nous allons bientôt améliorer cet outil afin qu'il vous envoie également le code par courrier électronique et par SMS."
+    ),
+    "already" => array (
+      "en" => "If you already have a booking code, enter it here, then click below to request, modify or cancel an appointment:",
+      "fr" => "Si vous avez déjà un code de réservation, entrez ici, puis cliquez ci-dessous pour demander, modifier ou annuler un rendez-vous:"
+    ),
+    "alreadyhelp" => array (
+      "en" => "If you have a booking code, enter it above, then click this buttom to request, cancel, or modify an appointment. Your priority will be based on your the first time you click this link.",
+      "fr" => "Si vous avez un code de réservation, entrez-le ci-dessus, puis cliquez sur ce bouton pour demander, annuler ou modifier un rendez-vous. Votre priorité sera basée sur votre première fois que vous cliquez sur ce lien."
+    ),
+    "alreadybutton" => array (
+      "en" => "Click here to request or modify an appointment",
+      "fr" => "Cliquez ici pour demander ou modifier un rendez-vous"
+    ),
+    "currentinfo" => array (
+      "en" => "Current information about this queue",
+      "fr" => "État actuel de cette file d'attente"
+    ),
+    "avinnext" => array (
+      "en" => "appointments available in the next %1 hours",
+      "fr" => "rendez-vous disponibles dans les %1 prochaines heures"
+    ),
+    "avrange" => array (
+      "en" => "appointments available between %1 and %2 hours from now.",
+      "fr" => "rendez-vous disponibles entre %1 et %2 heures à partir de maintenant"
+    ),
+    "after48" => array (
+      "en" => "appointments currently accepting bookings after %1 hours from now",
+      "fr" => "rendez-vous acceptant actuellement les réservations après %1 heures"
+    ),
+    "earliest" => array (
+      "en" => "Earliest appointment currently available",
+      "fr" => "Premier rendez-vous actuellement disponible"
+    ),
+    "latest" => array (
+      "en" => "Latest appointment currently available to book",
+      "fr" => "Dernier rendez-vous actuellement disponible pour réserver"
+    ),
+    "noneavail" => array (
+      "en" => "No appointments available",
+      "fr" => "Aucun rendez-vous n'est actuellement disponible"
+    ),
+    "tt" => array (
+      "en" => "xxxEN",
+      "fr" => "xxxFR"
+    ),
+    "ff" => array (
+      "en" => "xxxEN",
+      "fr" => "xxxFR"
+    ),
+
+    "jjj" => array (
+      "en" => "xxxEN",
+      "fr" => "xxxFR"
+    )
+
+  );
+  return($transtab[$transkey][$lang]);
+}
+
+function trans1($transkey,$arg1) {
+  return str_replace("%1",$arg1,trans($transkey));
+}
+
+function trans2($transkey,$arg1,$arg2) {
+  return str_replace("%2",$arg2,trans1($transkey,$arg1));
+}
+
+function transday($englishday) {
+  global $lang;
+  if($lang!="fr") return($englishday);
+  $dowk= array (
+    "Sunday" => "Dimanche",
+    "Monday" => "Lundi",
+    "Tuesday" => "Mardi",
+    "Wednesday" => "Mercredi",
+    "Thursday" => "Jeudi",
+    "Friday" => "Vendredi",
+    "Saturday" => "Samedi"
+  );
+  return $dowk[$englishday];
+}
+
 
 ?>

@@ -45,16 +45,31 @@ require_once ("scripts/config.php");
 }
 </style>  
 
+<?php
+if(isset($_REQUEST["queuename"])) { ?>
+
+<script type="text/javascript" src="lib/qrcode.min.js" />
+<script type="text/javascript"> alert(test);  </script>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+  //alert("testing it");
+    new QRCode(document.getElementById("qrcode"),
+    {
+      text: "https://quickrendezvous.org/qr/?queuename=<?php echo $_REQUEST["queuename"]?>&lang=<?php echo $lang?>",
+      width: 80,
+      height:80
+    }
+  );
+ },false);
+  
+</script>
+<?php } ?>
 
 </head>
 <body>
 
 <?php
-  if (file_exists("queues/".$queuename."/metadata.json")) {
-    $queueMetadataJson=file_get_contents("queues/".$queuename."/metadata.json");
-    $queueMetadata=json_decode($queueMetadataJson,true);
-    echo("<h1>".$queueMetadata["queuetitle"]."</h1>");
-  }
   
   if(!isset($_REQUEST["queuename"])) {
     // Display intro page
@@ -67,13 +82,33 @@ require_once ("scripts/config.php");
     echo ("</body>");
     exit(0);
   }
-  
+
+
+  echo $floatlangblock;
 ?>
 
+<?php
+  if (file_exists("queues/".$queuename."/metadata.json")) {
+    $queueMetadataJson=file_get_contents("queues/".$queuename."/metadata.json");
+    $queueMetadata=json_decode($queueMetadataJson,true);
 
+    if($lang=="fr" && isset($queueMetadata["queuetitle-fr"])) {
+      echo("<h1>".$queueMetadata["queuetitle-fr"]."</h1>");
+    }
+    else {
+      echo("<h1>".$queueMetadata["queuetitle"]."</h1>");
+    }
 
+    if($lang=="fr" && isset($queueMetadata["description-fr"])) {
+      echo("<p>".$queueMetadata["description-fr"]."</p>");
+    }
+    else {
+      echo("<p>".$queueMetadata["description"]."</p>");
+    }
+  }
+?>
 
-<h2>Book an appointment in queue: <?php echo $queuename ?></h2>
+<h2><?php echo trans("bookin").": ".$queuename ?></h2>
 
 <?php
   if (isset($_REQUEST["errorToDisplay"])) {
@@ -81,30 +116,21 @@ require_once ("scripts/config.php");
   }
 ?>
 
+<p><b><?php echo(trans("startby"));?></b></p>
 
-<p>This tool is under development, but functional. Currently this is a proof-of-concept to demonstrate a better way to book testing appointments for Covid-19. If all goes well we should be able turn this, or a similar system, live shortly. </p>
-
-<p>Its purpose is to allow you to book an appointment. You need to register your basic information first. Then you will be given a 6-character booking code. You must use this code to book your appointment. You can also use the same code to cancel your appointment (making it available to others), or try to get an earlier appointment, or ask for a later appointment.</p>
-
-<p>If you are not initially given an appointment because they are all full, your booking code will maintain its priority in the queue and will be given an appointment when new ones become available. You should check back to see if one has been made for you, and confirm it. If you do not confirm, it will likely be given to somebody else.</p>
-
-<p>There is a separate administrative process for adding additional appointments, on a rolling basis, so there should be a rush at any particular point in time to obtain an appointment.</p>
-
-<p><b>Start by clicking the following button to obtain a booking code. This code will be valid for making one appointment (for an individual or family)</b></p>
-
-<a class="button2" href="scripts/manageBooking.php?queuename=<?php echo($queuename)?>" title="This will ask you for basic information such as your name, and the number of people to attand the appointment. It will then give you a code that you can later use to request an appointment. When you are given the code, make sure you write it down. We will soon enhance this tool so it will also email and text the code to you.">
-Register to get a booking code
+<a class="button2" href="scripts/manageBooking.php?queuename=<?php echo($queuename);?>&lang=<?php echo($lang);?>" title="<?php echo(trans("registerhelp"));?>bb me">
+<?php echo(trans("register"));?>
 </a>
 
 <br/>&nbsp;<br/>
 
 <form method="post" action="scripts/manageBooking.php?queuename=<?php echo($queuename)?>">
-<label for="bookingcode"><b>If you already have a booking code, enter it here, then click below to request, modify or cancel an appointment:</b></label><br/>
+<label for="bookingcode"><b><?php echo trans("already");?></b></label><br/>
 <input type="text" id="bookingcode" name="bookingcode"></input>
 
 <br/>
 
-<input type="submit" class="button2" title="If you have a booking code, enter it above, then click this buttom to request, cancel, or modify an appointment. Your priority will be based on your the first time you click this link." value="Click here to request or modify an appointment.">
+<input type="submit" class="button2" title="<?php echo trans("alreadyhelp");?>" value="<?php echo trans("alreadybutton");?>">
 
 </input>
 </form>
@@ -114,7 +140,6 @@ $dir_prefix="";
 require_once ("scripts/queuestats.php");
 echo $queueInfoHtml;
 ?>
-
 
 
 </body>

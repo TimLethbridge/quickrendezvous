@@ -49,7 +49,18 @@ require_once ("scripts/config.php");
 </head>
 <body>
 
-<h1>Book an appointment in queue: <?php echo $queuename ?></h1>
+<?php
+  if (file_exists("queues/".$queuename."/metadata.json")) {
+    $queueMetadataJson=file_get_contents("queues/".$queuename."/metadata.json");
+    $queueMetadata=json_decode($queueMetadataJson,true);
+    echo("<h1>".$queueMetadata["queuetitle"]."</h1>");
+  }
+?>
+
+
+
+
+<h2>Book an appointment in queue: <?php echo $queuename ?></h2>
 
 <?php
   if (isset($_REQUEST["errorToDisplay"])) {
@@ -68,25 +79,29 @@ require_once ("scripts/config.php");
 
 <p><b>Start by clicking the following button to obtain a booking code. This code will be valid for making one appointment (for an individual or family)</b></p>
 
-<a class="button2" href="scripts/getBookingCode.php" title="This will ask you for basic information such as your name, and the number of people to attand the appointment. It will then give you a code that you can later use to request an appointment. When you are given the code, make sure you write it down. We will soon enhance this tool so it will also email and text the code to you.">
+<a class="button2" href="scripts/manageBooking.php?queuename=<?php echo($queuename)?>" title="This will ask you for basic information such as your name, and the number of people to attand the appointment. It will then give you a code that you can later use to request an appointment. When you are given the code, make sure you write it down. We will soon enhance this tool so it will also email and text the code to you.">
 Register to get a booking code
 </a>
 
 <br/>&nbsp;<br/>
 
-<form action="scripts/manageBooking.php">
+<form method="post" action="scripts/manageBooking.php?queuename=<?php echo($queuename)?>">
 <label for="bookingcode"><b>If you already have a booking code, enter it here, then click below to request, modify or cancel an appointment:</b></label><br/>
-<input type="text" id="bookingcode" na,e="fname"></input>
+<input type="text" id="bookingcode" name="bookingcode"></input>
 
 <br/>
 
-<input type="submit" class="button2" href="scripts/getBookingCode" title="If you have a booking code, enter it above, then click this buttom to request, cancel, or modify an appointment. Your priority will be based on your the first time you click this link." value="Click here to request or modify an appointment.">
+<input type="submit" class="button2" title="If you have a booking code, enter it above, then click this buttom to request, cancel, or modify an appointment. Your priority will be based on your the first time you click this link." value="Click here to request or modify an appointment.">
 
 </input>
 </form>
 
 <?php
+$dir_prefix="";
 require_once ("scripts/queuestats.php");
+echo $queueInfoHtml;
 ?>
+
+
 
 </body>

@@ -4,7 +4,7 @@
 //
 // This outputs stats in html about the queue in $queuename
 
-$availlist=glob("queues/".$queuename."/apptavail/appt-*");
+$availlist=glob($dir_prefix."queues/".$queuename."/apptavail/appt-*");
 
 $thecurrent=time();
 $allapptcount=0;
@@ -23,7 +23,12 @@ foreach($availlist as $listitem) {
     $apptdetail[4],$apptdetail[5],$apptdetail[6],
     $apptdetail[2],$apptdetail[3],$apptdetail[1]);
 
-  if($appttime > $thecurrent) {
+  if($appttime <= $thecurrent) {
+    // It was old, so delete it
+    unlink($listitem);
+  }
+  else
+  {
     $allapptcount++;
     if($appttime < ($thecurrent+3*60*60)) $next3hourscount++;
     if($appttime < ($thecurrent+8*60*60)) $next8hourscount++;
@@ -46,6 +51,8 @@ foreach($availlist as $listitem) {
     }
   }
 }
+
+ob_start();
 
 ?>
 
@@ -71,6 +78,11 @@ foreach($availlist as $listitem) {
 
 
 <p><?php echo $latesttime ?>
+
+<?php
+  $queueInfoHtml=ob_get_contents();
+  ob_end_clean();
+ ?>
 
 
 

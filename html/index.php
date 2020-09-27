@@ -55,6 +55,19 @@ require_once ("scripts/config.php");
     $queueMetadata=json_decode($queueMetadataJson,true);
     echo("<h1>".$queueMetadata["queuetitle"]."</h1>");
   }
+  
+  if(!isset($_REQUEST["queuename"])) {
+    // Display intro page
+    if(isset($_REQUEST["lang"]) && $_REQUEST["lang"] == "fr") {
+      echo readfile("rawIntro-fr.html");
+    }
+    else {
+      echo readfile("rawIntro.html");
+    }
+    echo ("</body>");
+    exit(0);
+  }
+  
 ?>
 
 

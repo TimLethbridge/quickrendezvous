@@ -57,6 +57,10 @@ if(isset($_REQUEST["queuename"])) { ?>
   echo $floatlangblock;
 ?>
 
+  <span style="float: left">
+          <img src="images/quickrendezvouslogosm.png"  height=70 />        
+        </span> 
+
 <?php
   if (file_exists("queues/".$queuename."/metadata.json")) {
     $queueMetadataJson=file_get_contents("queues/".$queuename."/metadata.json");

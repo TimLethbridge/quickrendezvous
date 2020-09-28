@@ -15,6 +15,31 @@ require_once ("config.php");
 <?php readfile("mainstyles.css"); ?>
 </style>  
 
+<?php
+if(isset($_REQUEST["queuename"]) && (
+  isset($_REQUEST["bookingcode"]) || isset($_POST["bookingcode"])
+  ) ) { 
+
+  ?>
+
+<script type="text/javascript" src="lib/qrcode.min.js" />
+<script type="text/javascript"> var a=5;  </script>
+
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+  //alert("testing it");
+    new QRCode(document.getElementById("qrcode"),
+    {
+      text: "https://quickrendezvous.org/qr/?queuename=<?php echo $_REQUEST["queuename"]?>&lang=<?php echo $lang?>",
+      width: 80,
+      height:80
+    }
+  );
+ },false);
+  
+</script>
+<?php } ?>
+
 <script>
 function validateForm() {
   var firstName, lastName, numPeople, message;
@@ -38,12 +63,24 @@ function validateForm() {
     document.getElementById("errormessage").innerHTML = message;
     return false;
   }
+  return true;
 }
 </script>
 
 </head>
 <body>
+
 <?php
+  echo $floatlangblock;
+  // Set empty values
+  $firstname="";
+  $lastname="";
+  $emailaddress="";
+  $cellphone="";
+  $numpeople=1;
+  $bookingcode="";
+  $appointment="";
+
   if (file_exists("../queues/".$queuename."/metadata.json")) {
     $queueMetadataJson=file_get_contents("../queues/".$queuename."/metadata.json");
     $queueMetadata=json_decode($queueMetadataJson,true);
@@ -54,45 +91,81 @@ function validateForm() {
   $dir_prefix="../";
   require_once ("queuestats.php");
 
-  if (isset($_POST["bookingcode"])) {
-    // Case 1: We came from a form where a bookingcode had been entered to search
+  if ((isset($_POST["bookingcode"]) && !isset($_POST["lastname"]))
+     || isset($_REQUEST["bookingcode"])) {
+    // Case 1: We came from a form where only bookingcode had been entered to search
     // Load the appointment and information
     // If not found, go back to the main form.
-    echo "<p>DEBUG: Will search and fill in the information if found.</p>";
+    if(isset($_REQUEST["bookingcode"])) {
+      $bookingcode=$_REQUEST["bookingcode"];
+    }
+    else {
+      $bookingcode=$_POST["bookingcode"];    
+    }
+    $fileToLoad="../queues/".$queuename."/requestors/".$bookingcode.".json";
+    if (file_exists($fileToLoad)) {
+      $queueMetadataJson=file_get_contents($fileToLoad);
+      $requestorMetadata=json_decode($queueMetadataJson,true);
+      $firstname=$requestorMetadata["firstname"];
+      $lastname=$requestorMetadata["lastname"];
+      $emailaddress=$requestorMetadata["emailaddress"];
+      $cellphone=$requestorMetadata["cellphone"];
+      $numpeople=$requestorMetadata["numpeople"];
+      if(isset($requestorMetadata["appointment"])) {
+        $appointment=$requestorMetadata["appointment"];
+      }
+    }
+    else { // File does not exist
+      echo("<p>Booking code ".$bookingcode." was not found in this queue; please go back to try again. Booking codes are only good for one appointment, so it may be an old one.</p>");
+    }    
   }
   if (isset($_POST["lastname"])) {
     // Case 2: We came from a form  where data was filled in
-    // Attempt to save/update the data, then display it
-
-    $bookingcode=randbase36(9);
-    echo "<p>Your booking code is <b>".$bookingcode."</b> -- Please write this information down so you can come back later </p>";
-    
-    // Grab the first appointment (if any available)
-    // First sort so we have them available in time.
-    asort($availlist);
-    $didGetAppt=false;
-    $appointment="";
-    foreach($availlist as $listitem) {
-      $filecomponents=explode("/",$listitem);
-      $appointment=$filecomponents[4];
-      $didGetAppt = rename($listitem,
-        "../queues/".$queuename."/apptbooked/".$appointment."_".$bookingcode);
-      if($didGetAppt) break;
+    // Attempt to save/update the data, then display it for change
+    // We grab a new appointment too, if we don't have one.
+    if(!isset($_POST["bookingcode"]) || $_POST["bookingcode"]=="" ) {
+      // Case 2a: Data had been freshly entered so needs saving and appt making
+      $bookingcode=randbase36(9);
+      // Grab the first appointment (if any available)
+      // First sort so we have them available in time.
+      asort($availlist);
+      $didGetAppt=false;
+      $appointment="";
+      foreach($availlist as $listitem) {
+        $filecomponents=explode("/",$listitem);
+        $appointment=$filecomponents[4];
+        $didGetAppt = rename($listitem,
+          "../queues/".$queuename."/apptbooked/".$appointment."_".$bookingcode);
+        if($didGetAppt) break;
+      }
     }
-    echo "Got appointment ".$appointment;
+    else {
+      // Case 2b: We previously had saved a bookincode
+      $bookingcode = $_POST["bookingcode"];
+
+    }
     
-    // Save the information
-    echo "<p>DEBUG: Will save the information.</p>";
+    // Save the information which may be new or modified
+    $lastname=$_POST["lastname"];
+    $firstname=$_POST["firstname"];
+    $emailaddress=$_POST["emailaddress"];
+    $cellphone=$_POST["cellphone"];
+    $numpeople=$_POST["numpeople"];
+    if($appointment=="") {
+      // get previously saved one if any
+      $appointment=$_POST["appointment"];
+    }
+
     $requestorMetadata = json_encode(Array (
-      "lastname" => $_POST["lastname"],
-       "firstname" => $_POST["firstname"],
-       "emailaddress" => $_POST["emailaddress"],
-       "cellphone" => $_POST["cellphone"],
-       "numpeople" => $_POST["numpeople"],
-       "appointment" => $appointment
-     ),JSON_PRETTY_PRINT);
-    $thefile =
-      fopen("../queues/".$queuename."/requestors/".$bookingcode.".json","w");
+      "lastname" => $lastname,
+      "firstname" => $firstname,
+      "emailaddress" => $emailaddress,
+      "cellphone" => $cellphone,
+      "numpeople" => $numpeople,
+      "appointment" => $appointment
+    ),JSON_PRETTY_PRINT);
+    $filenametowrite="../queues/".$queuename."/requestors/".$bookingcode.".json";
+    $thefile = fopen($filenametowrite,"w");
     fwrite($thefile,$requestorMetadata);
     fclose($thefile);
   }
@@ -102,35 +175,62 @@ function validateForm() {
     // We don't have a booking code yet and we have to fill in fresh information
     echo "<p>Use the following to enter data and create an appointment.</p>";
   }
+  
+  if($bookingcode !="") {
+    echo "<p>Your booking code is <b>".$bookingcode."</b> -- Please print this page or write this information down so you can come back later </p>";
+  }
+
+  if($appointment !="") {
+    $apptdetail=explode("-",$appointment);
+    $appttime=mktime(
+      $apptdetail[4],$apptdetail[5],$apptdetail[6],
+      $apptdetail[2],$apptdetail[3],$apptdetail[1]);    
+    $prettyApptTime=transday(date("l",$appttime))." ".
+      $apptdetail[1]."-".$apptdetail[2]."-".$apptdetail[2]." at ".
+      $apptdetail[4].":".$apptdetail[5].":".$apptdetail[6];
+    
+    echo "<p>Your appointment is: <font size=\"+2\"> <b>".$prettyApptTime."</b> </font></p>";
+  }
+  else {
+    if($bookingcode!="") {
+      echo "<p>We have not been able to make an appointment for you yet. Keep trying using this same booking code.</b></p>";
+    }
+  }
 
 ?>
 
 <b><p id="errormessage" style="color:red"> </p></b>
 
-<form name="apptData" method="post" action="manageBooking.php?queuename=<?php echo($queuename)?>"  onsubmit="return validateForm()">
+<form name="apptData" method="post" action="manageBooking.php?queuename=<?php echo($queuename)?>"  onsubmit="return validateForm();">
 
 <label for="lastname"><b>Lastname:</b></label><br/>
-<input type="text" id="lastname" name="lastname" ></input>
+<input type="text" id="lastname" name="lastname" value="<?php echo $lastname;?>"></input>
 <br/>
 
 <label for="firstname"><b>Firstname:</b></label><br/>
-<input type="text" id="firstname" name="firstname" ></input>
+<input type="text" id="firstname" name="firstname" value="<?php echo $firstname;?>"></invput>
 <br/>
 
 <label for="emailaddress"><b>Email Address:</b></label><br/>
-<input type="text" id="emailaddress" name="emailaddress"></input>
+<input type="text" id="emailaddress" name="emailaddress" value="<?php echo $emailaddress;?>"></input>
 <br/>
 
 <label for="cellphone"><b>Cellphone for Texts:</b></label><br/>
-<input type="text" id="cellphone" name="cellphone"></input>
+<input type="text" id="cellphone" name="cellphone" value="<?php echo $cellphone;?>"></input>
 <br/>
 
 <label for="numpeople"><b>Number of People:</b></label><br/>
-<input type="text" id="numpeople" name="numpeople"></input>
+<input type="text" id="numpeople" name="numpeople" value="<?php echo $numpeople;?>"></input>
+<br/>
+
+<input type="hidden" id="bookingcode" name="bookingcode" value="<?php echo $bookingcode;?>"></input>
+<br/>
+
+<input type="hidden" id="appointment" name="appointment" value="<?php echo $appointment;?>"></input>
 <br/>
 
 
-<input type="submit" class="button2" title="Enter or change the information above then click here to change your information." value="Click here to enter or modify your data.">
+<input type="submit" class="button2" title="Enter or change the information above then click here." value="Click here to enter or modify your data.">
 
 </input>
 </form>
@@ -139,13 +239,14 @@ function validateForm() {
 echo $queueInfoHtml;
 ?>
 
-<p>Test</p>
 
 <?php
-
+/* FOR DEBUG
 echo "<pre>";
 print_r(get_defined_vars());
 echo "</pre>";
+*/
+
  ?>
 
 </body>

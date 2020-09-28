@@ -19,7 +19,7 @@ require_once ("scripts/config.php");
 if(isset($_REQUEST["queuename"])) { ?>
 
 <script type="text/javascript" src="lib/qrcode.min.js" />
-<script type="text/javascript"> alert(test);  </script>
+<script type="text/javascript"> var a=5;  </script>
 
 <script type="text/javascript">
   document.addEventListener('DOMContentLoaded', function() {

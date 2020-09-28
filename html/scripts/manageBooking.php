@@ -122,7 +122,7 @@ function validateForm() {
   require_once ("queuestats.php");
 
   if ((isset($_POST["bookingcode"]) && !isset($_POST["lastname"]))
-     || isset($_REQUEST["bookingcode"])) {
+     || isset($_REQUEST["bookingcode"]) && !isset($_POST["lastname"])) {
     // Case 1: We came from a form where only bookingcode had been entered to search
     // Load the appointment and information
     // If not found, go back to the main form.

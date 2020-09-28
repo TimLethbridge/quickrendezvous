@@ -16,7 +16,9 @@ function getnewappointment($thequeue, $thebookingcode, $theavaillist) {
   foreach($theavaillist as $listitem) {
     $filecomponents=explode("/",$listitem);
     $theappointment=$filecomponents[4];
-    $didGetAppt = rename($listitem,
+    // This may fail if an appointment gets deleted while we are trying
+    // to book it. We will keep trying.
+    $didGetAppt = @rename($listitem,
        "../queues/".$thequeue."/apptbooked/".$theappointment."_".$thebookingcode);
     if($didGetAppt) break;
   }
@@ -70,7 +72,7 @@ function validateForm() {
   firstName = document.getElementById("firstname").value;
   numPeople = document.getElementById("numpeople").value;
 
-  if (lastName.length<3) {
+  if (lastName.length<2) {
     message = "The last name must have at least two characters.";
     document.getElementById("errormessage").innerHTML = message;
     return false;
@@ -88,7 +90,12 @@ function validateForm() {
 
 </head>
 <body>
-<p><em><font color="orange">Please do not rely on this site yet. It is currently a proof of concept to demonstrate ideas, test and obtain feedback.</font></em></p>
+<p><em><font color="orange">Please do not rely on this site yet. It is currently a proof of concept to demonstrate ideas, test and obtain feedback. Some functions are incomplete and there are known bugs. Ne vous fiez pas encore à ce site. Il s'agit actuellement d'une preuve de concept pour démontrer des idées, tester et obtenir des commentaires. Certaines fonctions sont incomplètes et il existe des bogues connus. Please send suggestions to:  Veuillez envoyer vos suggestions à: <a href="mailto:timothy.lethbridge@uottawa.ca">timothy.lethbridge@uottawa.ca</a></font></em></p>
+
+  <span style="float: left">
+          <img src="../images/quickrendezvouslogosm.png" style="padding-right: 5px"   height=70 />        
+        </span> 
+
 
 <?php
   echo $floatlangblock;
@@ -105,7 +112,10 @@ function validateForm() {
     $queueMetadataJson=file_get_contents("../queues/".$queuename."/metadata.json");
     $queueMetadata=json_decode($queueMetadataJson,true);
     echo("<h1>".$queueMetadata["queuetitle"]."</h1>");
+    echo("<p>".$queueMetadata["description"]."</p>");
+
   }
+
 
   // Analyse the queue (printed at end, but needed for booking)
   $dir_prefix="../";
@@ -137,6 +147,9 @@ function validateForm() {
     }
     else { // File does not exist
       echo("<p>Booking code ".$bookingcode." was not found in this queue; please go back to try again. Booking codes are only good for one appointment, so it may be an old one.</p>");
+      
+      echo "<p><a href=\"../?lang=".$lang."&queuename=".$queuename."\" class=\"button2\" title=\"Click here to back to the page where you can enter your booking code, or request a new one.\">Go back to the page where you can enter your booking code, or request a new one</a></p>";
+      exit(0);
     }    
   }
   if (isset($_POST["lastname"])) {
@@ -220,19 +233,19 @@ function validateForm() {
 <form name="apptData" method="post" action="manageBooking.php?queuename=<?php echo($queuename)?>"  onsubmit="return validateForm();">
 
 <label for="lastname"><b>Lastname:</b></label><br/>
-<input type="text" id="lastname" name="lastname" value="<?php echo $lastname;?>"></input>
+<input type="text" id="lastname" name="lastname" value="<?php echo $lastname;?>" title="A name is required. The people managing this queue may cancel your appointment if this is incorrect."></input>
 <br/>
 
 <label for="firstname"><b>Firstname:</b></label><br/>
-<input type="text" id="firstname" name="firstname" value="<?php echo $firstname;?>"></invput>
+<input type="text" id="firstname" name="firstname" value="<?php echo $firstname;?>" title="The people managing this queue may need your name, and may cancel your appointment if this is absent or incorrect."  ></invput>
 <br/>
 
 <label for="emailaddress"><b>Email Address:</b></label><br/>
-<input type="text" id="emailaddress" name="emailaddress" value="<?php echo $emailaddress;?>"></input>
+<input type="text" id="emailaddress" name="emailaddress" value="<?php echo $emailaddress;?>" title="Your email address will be available to the people in charge of this queue and they might contact you. It is possible that your appointment could be cancelled without notifying you if this email address is incorrect or absent." ></input>
 <br/>
 
 <label for="cellphone"><b>Cellphone for Texts:</b></label><br/>
-<input type="text" id="cellphone" name="cellphone" value="<?php echo $cellphone;?>"></input>
+<input type="text" id="cellphone" name="cellphone" value="<?php echo $cellphone;?>" title="Your phone number will be available to the people in charge of this queue and they might contact you. This site will be enhanced to enable verification of this number. There may be costs associated with sending texts. It is possible that your appointment could be cancelled without notifying you if this phone number is incorrect or absent."></input>
 <br/>
 
 <label for="numpeople"><b>Number of People:</b></label><br/>
@@ -246,7 +259,7 @@ function validateForm() {
 <br/>
 
 
-<input type="submit" class="button2" title="Enter or change the information above then click here." value="Click here to enter or modify your data.">
+<input type="submit" class="button2" title="Enter or change the information above then click here. Your booking code and appointment will remain unchanged." value="Click here to enter or modify your data">
 
 </input>
 </form>

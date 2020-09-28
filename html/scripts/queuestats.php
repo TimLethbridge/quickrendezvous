@@ -27,8 +27,8 @@ foreach($availlist as $listitem) {
     $apptdetail[2],$apptdetail[3],$apptdetail[1]);
 
   if($appttime <= $thecurrent) {
-    // It was old, so delete it
-    unlink($listitem);
+    // It was old, so delete it - may silently fail if another process has unlinked
+    @unlink($listitem);
   }
   else
   {

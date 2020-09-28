@@ -193,7 +193,7 @@ function trans($transkey) {
       "fr" => "Premier rendez-vous actuellement disponible"
     ),
     "latest" => array (
-      "en" => "Latest appointment currently available to book",
+      "en" => "Appointment currently available to book that is furthest in the future",
       "fr" => "Dernier rendez-vous actuellement disponible pour réserver"
     ),
     "noneavail" => array (

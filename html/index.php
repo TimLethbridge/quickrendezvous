@@ -38,7 +38,7 @@ if(isset($_REQUEST["queuename"])) { ?>
 
 </head>
 <body>
-<p><em><font color="orange">Please do not rely on this site yet. It is currently a proof of concept to demonstrate ideas, test and obtain feedback.</font></em></p>
+<p><em><font color="orange">Please do not rely on this site yet. It is currently a proof of concept to demonstrate ideas, test and obtain feedback. Some functions are incomplete and there are known bugs. Ne vous fiez pas encore à ce site. Il s'agit actuellement d'une preuve de concept pour démontrer des idées, tester et obtenir des commentaires. Certaines fonctions sont incomplètes et il existe des bogues connus. Please send suggestions to:  Veuillez envoyer vos suggestions à: <a href="mailto:timothy.lethbridge@uottawa.ca">timothy.lethbridge@uottawa.ca</a></font></em></p>
 
 
 <?php
@@ -60,7 +60,7 @@ if(isset($_REQUEST["queuename"])) { ?>
 ?>
 
   <span style="float: left">
-          <img src="images/quickrendezvouslogosm.png"  height=70 />        
+          <img src="images/quickrendezvouslogosm.png" style="padding-right: 5px"   height=70 />        
         </span> 
 
 <?php

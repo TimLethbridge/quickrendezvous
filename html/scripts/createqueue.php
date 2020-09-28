@@ -24,6 +24,8 @@ function validateForm() {
 
 </head>
 <body>
+<p><em><font color="orange">Please do not rely on this site yet. It is currently a proof of concept to demonstrate ideas, test and obtain feedback.</font></em></p>
+
 <h2>Queues currently can be created by the administrator of this site. The ability to create queues here will be added very soon.</h2>
 
 <p>This page may work, but it is still under development<p>

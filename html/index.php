@@ -38,6 +38,8 @@ if(isset($_REQUEST["queuename"])) { ?>
 
 </head>
 <body>
+<p><em><font color="orange">Please do not rely on this site yet. It is currently a proof of concept to demonstrate ideas, test and obtain feedback.</font></em></p>
+
 
 <?php
   

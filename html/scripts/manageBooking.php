@@ -4,6 +4,25 @@
 //
 // Set queuename and other features common to all scripts
 require_once ("config.php");
+
+function getnewappointment($thequeue, $thebookingcode, $theavaillist) {
+  // Core function to get first appointment
+  // May fail if others have got all of them first
+  // Will get a NEW appointment even if the booking code already has one
+  // Will be enhanced to allow for booking earlier or later
+  asort($theavaillist);
+  $didGetAppt=false;
+  $theappointment="";
+  foreach($theavaillist as $listitem) {
+    $filecomponents=explode("/",$listitem);
+    $theappointment=$filecomponents[4];
+    $didGetAppt = rename($listitem,
+       "../queues/".$thequeue."/apptbooked/".$theappointment."_".$thebookingcode);
+    if($didGetAppt) break;
+  }
+  return $theappointment; // if none obtained, then blank
+}
+
 ?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -69,6 +88,7 @@ function validateForm() {
 
 </head>
 <body>
+<p><em><font color="orange">Please do not rely on this site yet. It is currently a proof of concept to demonstrate ideas, test and obtain feedback.</font></em></p>
 
 <?php
   echo $floatlangblock;
@@ -126,18 +146,14 @@ function validateForm() {
     if(!isset($_POST["bookingcode"]) || $_POST["bookingcode"]=="" ) {
       // Case 2a: Data had been freshly entered so needs saving and appt making
       $bookingcode=randbase36(9);
+
       // Grab the first appointment (if any available)
-      // First sort so we have them available in time.
-      asort($availlist);
-      $didGetAppt=false;
-      $appointment="";
-      foreach($availlist as $listitem) {
-        $filecomponents=explode("/",$listitem);
-        $appointment=$filecomponents[4];
-        $didGetAppt = rename($listitem,
-          "../queues/".$queuename."/apptbooked/".$appointment."_".$bookingcode);
-        if($didGetAppt) break;
+      // $appointment should be blank
+      if($appointment != "") {
+        echo("<p>Debug Error: we are about to get a new appointment, but we already have one</p>");
       }
+      $appointment=getnewappointment($queuename, $bookingcode, $availlist);
+      if($appointment != "") $didGetAppt = true;
     }
     else {
       // Case 2b: We previously had saved a bookincode

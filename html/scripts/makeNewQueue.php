@@ -45,8 +45,10 @@ if(file_exists("../queues/".$queuename)) {
 // and they will have to be changed, but we leave this to the user
 
 $queuetitle="Queue called ".$queuename;
+$queuetitlefr="File d'attente qui s'apelle ".$queuename;
 
 $description="This is a new queue called ".$queuename." that has not been given a description yet. Users can still try to request appointments on the site. The administrator can change this description to change its purpose.";
+$descriptionfr="Ceci est une nouvelle file d'attente appelée".$queuename." qui n'a pas encore reçu de description Français. Les utilisateurs peuvent toujours essayer de demander des rendez-vous sur le site. L'administrateur peut modifier cette description pour changer son objectif."
 
 $logoURL="";
 $orgURL="";
@@ -54,9 +56,17 @@ $orgURL="";
 if (isset($_REQUEST["queuetitle"])) {
   $queuetitle=$_REQUEST["queuetitle"];
 }
+if (isset($_REQUEST["queuetitlefr"])) {
+  $queuetitle=$_REQUEST["queuetitlefr"];
+}
+
 if (isset($_REQUEST["description"])) {
   $description=$_REQUEST["description"];
 }
+if (isset($_REQUEST["descriptionfr"])) {
+  $description=$_REQUEST["descriptionfr"];
+}
+
 if (isset($_REQUEST["logoURL"])) {
   $logoURL=$_REQUEST["logoURL"];
 }
@@ -69,11 +79,11 @@ require_once ("checkpatternargs.php");
 
 // Generate json for the data
 
-echo "test";
-
 $queueMetadata = json_encode(Array (
   "queuetitle" => $queuetitle,
+  "queuetitle-fr" => $queuetitlefr,
   "description" => $description,
+  "description-fr" => $descriptionfr,
   "logoURL" => $logoURL,
   "orgURL" => $orgURL
 ),JSON_PRETTY_PRINT);
@@ -108,14 +118,10 @@ fwrite($thefile,$secretCodeToUse);
 fclose($thefile);
 
 
-echo "TRIED "."../queues/".$queuename;
 
 
-echo(" done SecretCode is ".$secretCodeToUse);
+echo(" The SecretCode to use to access this queue is ".$secretCodeToUse)." Give this URL to your participants";
 
-// Generate a secret code and write it to the directory
-
-// Report success to the end-user
 
 ?>
 

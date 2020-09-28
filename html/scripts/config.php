@@ -52,9 +52,14 @@ else { // if English the alternative is French
 }
 
 // If the incoming query had a language argument, we get rid of it
-$otherargs=str_replace("&lang=".$lang,"",$_SERVER["QUERY_STRING"]);
-$otherargs=str_replace("lang=".$lang."&","",$otherargs);
-$otherargs=str_replace("lang=".$lang,"",$otherargs);
+if(!isset($_SERVER["QUERY_STRING"])) {
+  $otherargs="";
+}
+else {
+  $otherargs=str_replace("&lang=".$lang,"",$_SERVER["QUERY_STRING"]);
+  $otherargs=str_replace("lang=".$lang."&","",$otherargs);
+  $otherargs=str_replace("lang=".$lang,"",$otherargs);
+}
 
 $floatlangblock = "\n
   <span style=\"float: right\">\n

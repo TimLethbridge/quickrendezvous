@@ -12,37 +12,7 @@ require_once ("scripts/config.php");
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Tool to quickly generate appointments first-come-first served fairly: Under development</title>
   <style>
-  .button2 {
-   border-top: 1px solid #d3bc8f;
-   line-height: 1.6;
-   background: #d8a695;
-   background: -webkit-gradient(linear, left top, left bottom, from(#e5bcae), to(#d8a695));
-   background: -webkit-linear-gradient(top, #e5bcae, #d8a695);
-   background: -moz-linear-gradient(top, #e5bcae, #d8a695);
-   background: -ms-linear-gradient(top, #e5bcae, #d8a695);
-   background: -o-linear-gradient(top, #e5bcae, #d8a695);
-   padding: 2px 5px;
-   -webkit-border-radius: 6px;
-   -moz-border-radius: 6px;
-   border-radius: 6px;
-   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
-   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
-   box-shadow: rgba(0,0,0,1) 0 1px 0;
-   text-shadow: rgba(0,0,0,.4) 0 1px 0;
-   color: white;
-   font-size: 14px;
-   font-family: 'Lucida Grande', Helvetica, Arial, Sans-Serif;
-   text-decoration: none;
-   vertical-align: middle;
-   }
-.button2:hover {
-   border-top-color: #810b09;
-   background: #810b09;
-   color: #ccc;
-   }
-.active {
-  background: #C98C7D;
-}
+<?php readfile("scripts/mainstyles.css"); ?>
 </style>  
 
 <?php
@@ -74,10 +44,10 @@ if(isset($_REQUEST["queuename"])) { ?>
   if(!isset($_REQUEST["queuename"])) {
     // Display intro page
     if(isset($_REQUEST["lang"]) && $_REQUEST["lang"] == "fr") {
-      echo readfile("rawIntro-fr.html");
+      readfile("rawIntro-fr.html");
     }
     else {
-      echo readfile("rawIntro.html");
+      readfile("rawIntro.html");
     }
     echo ("</body>");
     exit(0);

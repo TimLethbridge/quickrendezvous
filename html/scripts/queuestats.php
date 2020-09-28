@@ -72,9 +72,7 @@ ob_start();
 
 <p><?php echo $next48hourscount-$next24hourscount." ".trans2("avrange",24,48); ?>.</p>
 
-<p><?php echo $allapptcount-$next48hourscount ?>
- appointments currently accepting bookings after 48 hours from now.</p>
-
+<p><?php echo $allapptcount-$next48hourscount." ".trans1("after48",48); ?>.</p>
 
 <p><?php echo $latesttime ?>
 
